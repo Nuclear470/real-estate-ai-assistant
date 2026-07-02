@@ -1,1 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate AI Assistant</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .chat-container { width: 400px; height: 600px; background: white; border-radius: 15px; box-shadow: 0 5px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; }
+        .chat-header { background: #25D366; color: white; padding: 20px; border-radius: 15px 15px 0 0; }
+        .chat-header h2 { font-size: 18px; }
+        .chat-header p { font-size: 12px; opacity: 0.8; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 14px; }
+        .bot-message { background: #f0f0f0; align-self: flex-start; }
+        .user-message { background: #25D366; color: white; align-self: flex-end; }
+        .chat-input { display: flex; padding: 15px; gap: 10px; border-top: 1px solid #eee; }
+        .chat-input input { flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 25px; outline: none; font-size: 14px; }
+        .chat-input button { background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 14px; }
+        .typing { color: #999; font-size: 12px; padding: 0 20px; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>🏠 Real Estate Assistant</h2>
+            <p>Online • Typically replies instantly</p>
+        </div>
+        <div class="chat-messages" id="messages">
+            <div class="message bot-message">Hi! I'm your real estate assistant. How can I help you today?</div>
+        </div>
+        <div class="typing" id="typing"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type a message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 
+    <script>
+        const WEBHOOK_URL = 'https://hook.eu1.make.com/69ecwthmvjsmcbfvzicry93594000qtw';
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            input.value = '';
+
+            document.getElementById('typing').textContent = 'Assistant is typing...';
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                document.getElementById('typing').textContent = '';
+                addMessage(data.reply, 'bot');
+            } catch (error) {
+                document.getElementById('typing').textContent = '';
+                addMessage('Sorry, something went wrong. Please try again.', 'bot');
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message ${sender}-message`;
+            div.textContent = text;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
