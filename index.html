@@ -64,9 +64,16 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: message })
                 });
-                const data = await response.json();
-                document.getElementById('typing').textContent = '';
-                addMessage(data.reply, 'bot');
+               const text = await response.text();
+document.getElementById('typing').textContent = '';
+let reply;
+try {
+    const data = JSON.parse(text);
+    reply = data.reply;
+} catch(e) {
+    reply = text;
+}
+addMessage(reply || 'Sorry, no response received.', 'bot');
             } catch (error) {
                 document.getElementById('typing').textContent = '';
                 addMessage('Sorry, something went wrong.', 'bot');
