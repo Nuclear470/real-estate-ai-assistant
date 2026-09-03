@@ -64,16 +64,12 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: message })
                 });
-               const text = await response.text();
+            const text = await response.text();
 document.getElementById('typing').textContent = '';
-let reply;
-try {
-    const data = JSON.parse(text);
-    reply = data.reply;
-} catch(e) {
-    reply = text;
-}
-addMessage(reply || 'Sorry, no response received.', 'bot');
+const jsonStart = text.indexOf('"reply": "') + 10;
+const jsonEnd = text.lastIndexOf('"');
+const reply = text.substring(jsonStart, jsonEnd);
+addMessage(reply || 'No response received.', 'bot');
             } catch (error) {
                 document.getElementById('typing').textContent = '';
                 addMessage('Sorry, something went wrong.', 'bot');
